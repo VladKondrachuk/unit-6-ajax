@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Retro Gif</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+      <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">Giftastic</span>
+      </nav>
+  
+      <!-- Gifs will be stored here --> 
+      <form id="gif-form">
+        
+        <input type="text" id="search-input"><br>
+  
+        <!-- Button triggers new Gif to be added -->
+        <input id="add-search" type="submit" value="Search for a GIF">
+      </form>
+      <div id="gifs-view"></div>
+  <!--//////////////////////////////////End of HTML///////////////////////////////////////////////////////-->
+
+      <script type="text/javascript">
+        var searchesArray = [];
+        counter = 0;
+
+//////////////////////////////////End Function///////////////////////////////////////////////////////
+  
+        // Function for displaying Gifs               
+        function renderButtons() {
+          $("#gifs-view").empty();
+          for (var j = 0; j < searchesArray.length; j++) {
+            var a = $("<button>'");
+            a.addClass("gifsearch");
+            a.attr("data-name", searchesArray[j]);
+            a.text(searchesArray[j]);
+            $("#gifs-view").append(a);
+          }
+        }
+
+//////////////////////////////////End Function///////////////////////////////////////////////////////
+
+        // This function handles events where one button is clicked
+$("#add-search").on("click", function(event) {
+                  event.preventDefault();      
+                  var searchvar = $("#search-input").val().trim();          
+                  searchesArray.push(searchvar);           
+                  renderButtons();
+
+    $("button").on("click", function() {
+    // Grabbing and storing the Gif property value from the button
+      var searches = $(this).attr("data-name", searchvar);
+
+      // Constructing a queryURL using the animal name
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+      searchvar + "&api_key=rIGnR7qjbznYPXghK8nSPAgdYRJxck0u&limit=10";
+
+      // Performing an AJAX request with the queryURL
+      $.ajax({
+      url: queryURL,
+      method: "GET"
+      })
+      // After data comes back from the request
+      .then(function(response) {
+      console.log(queryURL);
+      console.log(response);
+      // storing the data from the AJAX request in the results variable
+      var results = response.data;
+
+////////////////////////////// Looping through each result item////////////////////////////////////
+          for (var i = 0; i < results.length; i++) {
+
+          // Creating and storing a div tag
+          var searchDiv = $("<div class='searchImage'>");
+
+          // Creating a paragraph tag with the result item's rating
+          var header = $("<h3>").text("Title: " + results[i].title);
+
+          var imgURL = response.data[i].images.downsized_still.url;
+
+          var imgURL2 = response.data[i].images.downsized.url;
+
+          var img = $("<img>").attr("src", imgURL);
+              img.addClass("gify");
+              img.attr("width", "275px");
+              img.attr("data-state", "still");
+              img.attr("data-still", imgURL);
+              img.attr("data-animate", imgURL2);
+
+          var img2 = $("<img>").attr("src", imgURL2);
+                                                                                                                          
+           // Appending the paragraph and image tag to the animalDiv
+          searchDiv.append(header);
+          searchDiv.append(img);
+
+          // Prependng the animalDiv to the HTML page in the "#gifs-appear-here" div
+          $("#gifs-view").append(searchDiv);
+
+          }
+      });
+  });
+});///////////////////End of $("button").on("click", function() ///////////////////
+         
+      $(document).on("click", ".gify", function () {
+      event.preventDefault();
+      if ($(this).attr("data-state") === "still") {
+          $(this).attr("data-state", "animate");
+          $(this).attr("src", $(this).attr("data-animate"));
+      } else {
+        $(this).attr("data-state", "still");
+        $(this).attr("src", $(this).attr("data-still"));
+        };
+      });
+       
+      </script>
+    </div>
+  </body>
+
+</html>
